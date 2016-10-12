@@ -10,12 +10,13 @@ import java.io.*;
 import java.math.BigInteger;
 
 public class  KeyMaster {	
+	public static boolean notFound = true;
 	public static void main(String[] args) throws IOException {
+		System.out.println(args[0]);
 		BigInteger bi = new BigInteger(args[0]);
         int keySize = Integer.parseInt(args[1]);
         byte[] key = Blowfish.asByteArray(bi, keySize);
-        byte[] ciphertext = Blowfish.fromBase64(args[2]);
-
+        String ciphertext = args[2];
 		ServerSocket sock = null;
 
 		try {
@@ -32,13 +33,13 @@ public class  KeyMaster {
 			 * is known as the "thread-per-message" approach.
 			 */
 			
-			int chunk = 1000000;
-			BigInteger biMax = new BigInterger(/max/??);
+			int chunk = 100;
+			BigInteger biMax = new BigInteger("2");
 			BigInteger nextStart = bi;
 			
-			while (true) {
+			while (notFound) {
 				// check if reached maximum number
-				if(nextStart + chunk >= biMax){
+				if(nextStart.add(BigInteger.valueOf(chunk)).compareTo(biMax.pow(keySize * 8)) >= 0){
 					break;
 				}
 				// now listen for connections
@@ -46,9 +47,11 @@ public class  KeyMaster {
 
 				// service the connection in a separate thread
 				//create a queue of chunks 
-				//set flag on completion true when the queue is empty
-				KeyConnection c = new KeyConnection(client, nextStart, chunk, keySize, cipherText); //pass params with chunk
+				KeyConnection c = new KeyConnection(client, nextStart, chunk, keySize, ciphertext); //pass params with chunk
 				c.start();
+//				System.out.println(bi.toString());
+				nextStart = nextStart.add(BigInteger.valueOf(chunk));
+//				System.out.println(notFound);
 			}
 		}
 		catch (IOException ioe) {

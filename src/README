@@ -137,7 +137,7 @@ successful decryption will cause it to stop and display the key.
 In this example we deliberately start with a key that is near the true
 one and can be found.
 
-java Search 158396074479790 6 uOHYfhAZvCUoLULdDmdLQWuRJGXPgbWJzeVIvzi0k5nYGRhWeyiFfA==
+  
 
 This should create the following output:
 

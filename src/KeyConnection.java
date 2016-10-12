@@ -15,9 +15,9 @@ public class KeyConnection extends Thread
 	BigInteger startKey;
 	int chunk;
 	int keySize;
-	byte[] ciphertext;
+	String ciphertext;
 	
-	public KeyConnection(Socket c, BigInteger key, int chunk, int keySize, byte[] ciphertext ) {
+	public KeyConnection(Socket c, BigInteger key, int chunk, int keySize, String ciphertext) {
 		client = c;
 		count.getAndIncrement();
 		this.startKey = key;
@@ -49,18 +49,26 @@ public class KeyConnection extends Thread
 			String response = null;
 			while (true) {
 				String line = networkBin.readLine();
-				if ( (line == null) || line.equals("finished")) {
+//				System.out.println("Client "+count+": "+line);
+				if ( line == null || line == "not found") {
 					break;
 				}
 				if (line.equals("ready")) {
-					response = startKey.toString() + chunk + keySize + Blowfish.decryptToString(ciphertext);
-				} else if (line.has("found")) {
+					response = startKey.toString() + " " + chunk + " " + keySize + " " + ciphertext;
+				} else if (line.contains("key")) {
 					System.out.println(line);
+					KeyMaster.notFound = false;
+					break;
 				}
+				// send the response plus a return and newlines (as expected by readLine)
+				networkPout.write(response+"\r\n");
+//				System.out.println("Server: "+response);
+				// force the send to prevent buffering
+				networkPout.flush();
 			}
 		}
 		catch (IOException ioe) {
-			System.err.println(ioe);
+//			System.err.println(ioe);
 		}
 		finally {
 			try {
@@ -72,7 +80,7 @@ public class KeyConnection extends Thread
 					client.close();
 			}
 			catch (IOException ioee) {
-				System.err.println(ioee);
+//				System.err.println(ioee);
 			}
 		}
 	}
